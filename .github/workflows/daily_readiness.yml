@@ -1,0 +1,31 @@
+name: Daily Readiness Engine
+
+on:
+  schedule:
+    # 01:00 UTC = 05:00 AM Muscat Time (GMT+4)
+    # This ensures the data is there when you wake up.
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  calculate-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy requests
+
+      - name: Run Engine
+        env:
+          # These keys map the Secrets to the Python os.environ variables
+          INTERVALS_API_KEY: ${{ secrets.INTERVALS_API_KEY }}
+          INTERVALS_ATHLETE_ID: ${{ secrets.INTERVALS_ATHLETE_ID }}
+        run: python readiness.py

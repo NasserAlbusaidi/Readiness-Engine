@@ -1,69 +1,85 @@
 # Intervals.icu Readiness Scorer
 
-This script calculates a daily "readiness" score based on your wellness data from [Intervals.icu](https://intervals.icu) and pushes it back to your calendar. It's designed to provide a single, actionable metric to help guide your training decisions.
+![Python](https://img.shields.io/badge/python-3.x-blue.svg)
 
-The script is designed to be run automatically, for example, using a GitHub Action.
 
-## Features
+A Python script that calculates a daily "readiness" score based on your wellness data from [Intervals.icu](https://intervals.icu) and pushes it back to your calendar. Designed to provide a single, actionable metric to help guide your training decisions.
 
--   Fetches wellness data from the Intervals.icu API.
--   Calculates a readiness score based on HRV, sleep, stress, and training load (TSB).
--   Pushes the calculated score and a descriptive label back to Intervals.icu as a custom wellness field.
--   Includes robust error handling and diagnostic modes to debug API key permissions.
--   Handles missing data by interpolation and provides warnings.
+---
 
-## How it Works
+## 🚀 Features
 
-The script performs the following steps:
+*   **Automated Data Fetching**: Retrieves the last 60 days of wellness data from the Intervals.icu API.
+*   **Advanced Metrics**: Calculates a readiness score based on:
+    *   Heart Rate Variability (HRV)
+    *   Sleep Score
+    *   Stress Score
+    *   Training Stress Balance (TSB)
+*   **Smart Analysis**: Uses a 60-day rolling baseline and standard deviation for HRV to calculate z-scores.
+*   **Actionable Insights**: Pushes a score (1-10) and a descriptive label (e.g., `GO_HARD`, `REST_LIFESTYLE`) back to Intervals.icu.
+*   **Robust**: Includes error handling, missing data interpolation, and diagnostic modes.
 
-1.  **Fetch Data**: It retrieves the last 60 days of your wellness data from the Intervals.icu API.
-2.  **Calculate Metrics**:
-    -   It calculates a 60-day rolling baseline and standard deviation for your HRV (log-transformed).
-    -   It uses this baseline to calculate a z-score for today's HRV, which indicates how your current HRV compares to your recent norm.
-3.  **Determine Readiness**: A readiness score (from 1 to 10) and a corresponding label (e.g., "GO_HARD", "REST_LIFESTYLE") are determined based on a series of logic gates that evaluate:
-    -   Sleep score
-    -   Stress score
-    -   Training Stress Balance (TSB)
-    -   HRV z-score
-4.  **Push Result**: The final score and label are pushed back to Intervals.icu for the current day.
+## 🛠️ How it Works
 
-## Installation
+1.  **Fetch Data**: Pulls historical wellness data.
+2.  **Calculate Metrics**: Computes rolling baselines and z-scores for HRV.
+3.  **Determine Readiness**: Evaluates logic gates based on Sleep, Stress, TSB, and HRV to assign a score.
+4.  **Push Result**: Updates your Intervals.icu calendar with the calculated readiness.
 
-1.  **Clone the repository:**
+## 📋 Prerequisites
+
+*   Python 3.x
+*   `pip` (Python package installer)
+*   An [Intervals.icu](https://intervals.icu) account
+
+## 📦 Installation
+
+1.  **Clone the repository**
     ```bash
     git clone https://github.com/your-username/intervalicu.git
     cd intervalicu
     ```
 
-2.  **Install dependencies:**
-    The script requires Python 3 and the following libraries: `requests`, `pandas`, and `numpy`. You can install them using pip:
+2.  **Install dependencies**
     ```bash
     pip install requests pandas numpy
     ```
 
-3.  **Set up environment variables:**
-    You need to provide your Intervals.icu Athlete ID and an API Key as environment variables.
-    -   `INTERVALS_API_KEY`: Your API key from the "Settings" page in Intervals.icu. **Make sure the key has "Wellness" permissions.**
-    -   `INTERVALS_ATHLETE_ID`: Your athlete ID (the `i` number, e.g., `i12345`).
+3.  **Set up Environment Variables**
+    You need to provide your credentials.
 
-    You can set these in your operating system, or if you are using the included GitHub Action, as secrets in your repository.
+    | Variable | Description |
+    | :--- | :--- |
+    | `INTERVALS_API_KEY` | Your API key from Intervals.icu "Settings". **Must have "Wellness" permissions.** |
+    | `INTERVALS_ATHLETE_ID` | Your athlete ID (e.g., `i12345`). |
 
-## Usage
+## 🏃 Usage
 
-To run the script manually:
+### Manual Run
+Run the script directly from your terminal:
 
 ```bash
 python readiness.py
 ```
 
-### Automation with GitHub Actions
+### 🤖 Automation (GitHub Actions)
+This repository includes a workflow in `.github/workflows/daily_readiness.yml` to run the script daily.
 
-This repository includes a GitHub Actions workflow in `.github/workflows/daily_readiness.yml` that runs the script automatically every day. To use it:
+1.  **Fork** this repository.
+2.  Go to **Settings > Secrets and variables > Actions**.
+3.  Add `INTERVALS_API_KEY` and `INTERVALS_ATHLETE_ID` as repository secrets.
+4.  The action will run automatically every day.
 
-1.  **Fork this repository.**
-2.  **Add your API Key and Athlete ID as repository secrets:**
-    -   Go to your repository's "Settings" > "Secrets and variables" > "Actions".
-    -   Create a new secret named `INTERVALS_API_KEY` with your API key.
-    -   Create a new secret named `INTERVALS_ATHLETE_ID` with your athlete ID.
-3.  The action will now run daily at the scheduled time. You can also trigger it manually from the "Actions" tab in your repository.
+## 📂 Project Structure
+
+```text
+.
+├── .github/
+│   └── workflows/
+│       └── daily_readiness.yml  # GitHub Actions workflow
+├── readiness.py                 # Main script
+└── README.md                    # This file
+```
+
+
 
